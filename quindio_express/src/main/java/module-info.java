@@ -1,6 +1,7 @@
 module co.edu.uniquindio.poo.quindio_express {
     requires javafx.controls;
     requires javafx.fxml;
+    requires java.desktop;
 
 
     opens co.edu.uniquindio.poo.quindio_express to javafx.fxml;
