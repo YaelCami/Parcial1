@@ -1,6 +1,6 @@
 package co.edu.uniquindio.poo.quindio_express;
 
-public interface IColeccionSimple<T> {
+public interface IColeccionSimple<T> extends Iterable<T>{
     void agregar(T elemento);
     boolean eliminar(T elemento);
     T obtener(int posicion);
