@@ -162,7 +162,46 @@ public class Empresa {
 
     // Para probar rápido - el parcial pide mínimo 30 paquetes, 5 destinos, 6 repartidores
     public void cargarDatosPrueba() {
+        // 6 repartidores (Sofía no disponible para probar esa regla)
+        registrarRepartidor(new Repartidor("R01", "Carlos", Municipio.ARMENIA, true));
+        registrarRepartidor(new Repartidor("R02", "Ana", Municipio.SALENTO, true));
+        registrarRepartidor(new Repartidor("R03", "Luis", Municipio.CALARCA, true));
+        registrarRepartidor(new Repartidor("R04", "Marta", Municipio.QUIMBAYA, true));
+        registrarRepartidor(new Repartidor("R05", "Jorge", Municipio.CIRCASIA, true));
+        registrarRepartidor(new Repartidor("R06", "Sofia", Municipio.ARMENIA, false));
 
+        // 30 paquetes, 5 destinos, códigos no consecutivos
+        registrarPaquete(new Paquete("PQ731", Municipio.ARMENIA, 2.5, 5, 30));
+        registrarPaquete(new Paquete("PQ105", Municipio.SALENTO, 3.0, 5, 25));
+        registrarPaquete(new Paquete("PQ942", Municipio.CALARCA, 1.2, 4, 20));
+        registrarPaquete(new Paquete("PQ318", Municipio.QUIMBAYA, 5.5, 3, 40));
+        registrarPaquete(new Paquete("PQ567", Municipio.CIRCASIA, 4.0, 5, 15));
+        registrarPaquete(new Paquete("PQ829", Municipio.ARMENIA, 1.8, 2, 60));
+        registrarPaquete(new Paquete("PQ214", Municipio.SALENTO, 6.2, 4, 35));
+        registrarPaquete(new Paquete("PQ421", Municipio.CALARCA, 2.0, 1, 50));
+        registrarPaquete(new Paquete("PQ842", Municipio.QUIMBAYA, 3.3, 3, 22));
+        registrarPaquete(new Paquete("PQ360", Municipio.CIRCASIA, 7.0, 5, 18));
+        registrarPaquete(new Paquete("PQ477", Municipio.ARMENIA, 2.2, 4, 28));
+        registrarPaquete(new Paquete("PQ593", Municipio.SALENTO, 1.5, 2, 45));
+        registrarPaquete(new Paquete("PQ650", Municipio.CALARCA, 4.4, 5, 12));
+        registrarPaquete(new Paquete("PQ184", Municipio.QUIMBAYA, 3.8, 3, 33));
+        registrarPaquete(new Paquete("PQ276", Municipio.CIRCASIA, 2.9, 4, 27));
+        registrarPaquete(new Paquete("PQ905", Municipio.ARMENIA, 5.0, 1, 70));
+        registrarPaquete(new Paquete("PQ118", Municipio.SALENTO, 2.7, 3, 31));
+        registrarPaquete(new Paquete("PQ739", Municipio.CALARCA, 6.5, 5, 19));
+        registrarPaquete(new Paquete("PQ452", Municipio.QUIMBAYA, 1.1, 2, 55));
+        registrarPaquete(new Paquete("PQ861", Municipio.CIRCASIA, 3.6, 4, 24));
+        registrarPaquete(new Paquete("PQ327", Municipio.ARMENIA, 4.8, 5, 15));  // empata con PQ567
+        registrarPaquete(new Paquete("PQ694", Municipio.SALENTO, 2.3, 1, 65));
+        registrarPaquete(new Paquete("PQ513", Municipio.CALARCA, 3.1, 3, 29));
+        registrarPaquete(new Paquete("PQ988", Municipio.QUIMBAYA, 5.9, 4, 21));
+        registrarPaquete(new Paquete("PQ246", Municipio.CIRCASIA, 2.6, 2, 48));
+        registrarPaquete(new Paquete("PQ775", Municipio.ARMENIA, 1.9, 3, 38));
+        registrarPaquete(new Paquete("PQ139", Municipio.SALENTO, 4.1, 5, 14));
+        registrarPaquete(new Paquete("PQ602", Municipio.CALARCA, 3.4, 2, 42));
+        registrarPaquete(new Paquete("PQ384", Municipio.QUIMBAYA, 2.8, 5, 17));
+        registrarPaquete(new Paquete("PQ957", Municipio.CIRCASIA, 6.0, 3, 26));
+
+        System.out.println("Datos cargados: 30 paquetes y 6 repartidores");
     }
-
 }

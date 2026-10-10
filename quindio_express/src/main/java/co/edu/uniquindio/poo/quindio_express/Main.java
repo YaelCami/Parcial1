@@ -1,5 +1,7 @@
 package co.edu.uniquindio.poo.quindio_express;
 
+import java.util.*;
+
 public class Main {
 
     public static void main(String[] args) {
@@ -64,10 +66,56 @@ public class Main {
         System.out.println("Eliminar PQ942 otra vez: " + empresa.getHistorial().eliminar(aEliminar));
         empresa.mostrarHistorial();
 
-        // 10. Análisis recursivo (pendiente, lo agrega el compañero de la recursividad)
-        // - Peso total de los paquetes de un municipio (recursivo)
-        // - Cantidad de paquetes con prioridad igual o superior a un valor (recursivo)
-        // - Búsqueda binaria de un paquete por código
-        // - Paquete de mayor peso (divide y vencerás)
+        // 10. Análisis recursivo
+        System.out.println("\n===== 10. Análisis recursivo =====");
+        AnaliticasRecursivas analiticas = new AnaliticasRecursivas();
+        List<Paquete> todos = empresa.getTodosLosPaquetes();
+
+        System.out.printf("Peso total de ARMENIA: %.1f kg%n", analiticas.pesoTotalPorMunicipio(todos, Municipio.ARMENIA));
+        System.out.println("Paquetes con prioridad >= 4: " + analiticas.contarPorPrioridadMinima(todos, 4));
+
+        // La búsqueda binaria exige la lista ordenada por código (precondición)
+        List<Paquete> ordenados = new ArrayList<>(todos);
+        Collections.sort(ordenados);   // usa el Comparable de Paquete: orden por código
+        Paquete buscado = analiticas.busquedaBinaria(ordenados, "PQ731");
+        System.out.println("Búsqueda binaria PQ731: " + (buscado != null ? buscado.getCodigo() : "no encontrado"));
+        analiticas.busquedaBinaria(ordenados, "PQ000");   // no existe: el propio método imprime el aviso
+
+        Paquete masPesado = analiticas.masPesadoDyV(todos);
+        System.out.println("Más pesado (divide y vencerás): " + masPesado.getCodigo() + " con " + masPesado.getPeso() + " kg");
+
+        // 11. Casos de la lista propia
+        System.out.println("\n===== 11. Casos de la lista propia =====");
+        HistorialEntregas<String> lista = new HistorialEntregas<>();
+
+        // Lista vacía
+        System.out.println("¿Vacía? " + lista.estaVacia());
+        System.out.println("Eliminar en vacía: " + lista.eliminar("A"));
+
+        // Un solo elemento
+        lista.agregar("A");
+        System.out.println("Tamaño: " + lista.tamano() + ", obtener(0): " + lista.obtener(0));
+        System.out.println("Eliminar único: " + lista.eliminar("A") + ", ¿vacía? " + lista.estaVacia());
+
+        // Varios elementos: primero, último e inexistente
+        lista.agregar("A");
+        lista.agregar("B");
+        lista.agregar("C");
+        lista.agregar("D");
+        System.out.println("Eliminar primero (A): " + lista.eliminar("A"));
+        System.out.println("Eliminar último (D): " + lista.eliminar("D"));
+        System.out.println("Eliminar inexistente (Z): " + lista.eliminar("Z"));
+        System.out.print("Quedó: ");
+        for (String s : lista) {
+            System.out.print(s + " ");
+        }
+        System.out.println();
+
+        // Posición inválida
+        try {
+            lista.obtener(5);
+        } catch (IndexOutOfBoundsException e) {
+            System.out.println("obtener(5) lanza IndexOutOfBoundsException");
+        }
     }
 }
