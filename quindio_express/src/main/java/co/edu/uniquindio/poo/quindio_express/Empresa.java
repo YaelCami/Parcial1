@@ -127,6 +127,17 @@ public class Empresa {
             System.out.println(p);
         }
     }
+    public List<Paquete> paquetesDeMunicipioOrdenados(Municipio m) {
+        List<Paquete> lista = paquetesPorMunicipio.getOrDefault(m, new ArrayList<>());
+        lista.sort(Comparator.comparing(Paquete::getCodigo)); // alfabético por código
+        return lista;
+    }
+
+    public void mostrarMunicipiosConPaquetes() {
+        for (Municipio muni : municipiosOrdenados) {
+            System.out.println(muni + " -> " + paquetesDeMunicipioOrdenados(muni));
+        }
+    }
 
     // --- REPORTES PARA EL MENU ---
 
@@ -142,7 +153,7 @@ public class Empresa {
 
     // Para probar rápido - el parcial pide mínimo 30 paquetes, 5 destinos, 6 repartidores
     public void cargarDatosPrueba() {
-        
+
     }
 
 }
