@@ -3,7 +3,7 @@ package co.edu.uniquindio.poo.quindio_express;
 import java.util.Objects;
 
 public class Paquete implements Comparable<Paquete>{
-    private String codigo;
+    private final String codigo; // NOTA JUANMA: Puse el codigo como final ya que el codigo es muy sensible, y que cambie puede ser peligroso
     private Municipio destino;
     private double peso;
     private int prioridad;
@@ -44,55 +44,37 @@ public class Paquete implements Comparable<Paquete>{
     @Override
     public int hashCode() { return Objects.hash(codigo); }
 
+    /* NOTA JUANMA: Tambien quite los setters, ya que ellos no validan, al quitar los setters dejamos el
+    paquete inmutable
+     */
 
     public String getCodigo() {
         return codigo;
-    }
-
-    public void setCodigo(String codigo) {
-        this.codigo = codigo;
     }
 
     public Municipio getDestino() {
         return destino;
     }
 
-    public void setDestino(Municipio destino) {
-        this.destino = destino;
-    }
-
     public double getPeso() {
         return peso;
-    }
-
-    public void setPeso(double peso) {
-        this.peso = peso;
     }
 
     public int getPrioridad() {
         return prioridad;
     }
 
-    public void setPrioridad(int prioridad) {
-        this.prioridad = prioridad;
-    }
-
     public int getTiempoEstimado() {
         return tiempoEstimado;
     }
 
-    public void setTiempoEstimado(int tiempoEstimado) {
-        this.tiempoEstimado = tiempoEstimado;
-    }
-
     @Override
     public String toString() {
-        return "Paquete{" +
-                "codigo='" + codigo + '\'' +
-                ", destino=" + destino +
-                ", peso=" + peso +
-                ", prioridad=" + prioridad +
-                ", tiempoEstimado=" + tiempoEstimado +
-                '}';
+        return "Paquete: " +
+                "Codigo: '" + codigo + '\'' +
+                ". Destino: " + destino +
+                ". Peso: " + peso +
+                ". Prioridad: " + prioridad +
+                ". Tiempo Estimado: " + tiempoEstimado;
     }
 }
