@@ -33,12 +33,14 @@ public class Empresa {
         paquetesEnOrdenLlegada = new LinkedHashMap<>();
         paquetesPorCodigo = new HashMap<>();
         municipiosUnicos = new HashSet<>();
-        municipiosOrdenados = new TreeSet<>();
+        municipiosOrdenados = new TreeSet<>(Comparator.comparing(Municipio::name));
         paquetesPorMunicipio = new HashMap<>();
-        colaLlegada = new LinkedList<>();
-        colaPrioridad = new PriorityQueue<>();
+        colaLlegada = new ArrayDeque<>();
+        colaPrioridad = new PriorityQueue<>(new ComparadorPorPrioridad());
+        historialEntregas = new HistorialEntregas<>();
         repartidoresPorId = new HashMap<>();
     }
+
     public boolean registrarPaquete(Paquete p) {
         if (paquetesPorCodigo.containsKey(p.getCodigo())) {
             System.out.println("Error: código duplicado " + p.getCodigo());
@@ -116,9 +118,16 @@ public class Empresa {
 
     // --- HISTORIAL CON TU LISTA PROPIA ---
 
-    public void registrarEntregaEnHistorial(Paquete p) {
-        // Conserva orden real de entrega
+    public boolean registrarEntrega(String codigo, String idRepartidor) {
+        Paquete p = paquetesPorCodigo.get(codigo);
+        Repartidor r = repartidoresPorId.get(idRepartidor);
+        if (p == null || r == null) return false;
+
+        colaLlegada.remove(p);
+        colaPrioridad.remove(p);
         historialEntregas.agregar(p);
+        r.setDisponible(true);
+        return true;
     }
 
     public void mostrarHistorial() {
