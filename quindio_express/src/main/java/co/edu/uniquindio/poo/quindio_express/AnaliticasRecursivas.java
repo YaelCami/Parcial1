@@ -87,15 +87,19 @@ public class AnaliticasRecursivas {
 
     // 4. Paquete más pesado con Divide y Vencerás
 
-    public Paquete masPesadoDyV(List<Paquete> lista){
-        int izq = 0;
-        int der = lista.size() - 1;
-
-        return masPesadoDyV(lista, izq, der);
+    // MÉTODO QUE LLAMAS DESDE EL MAIN - FALTABA ESTE
+    public static Paquete masPesadoDyV(List<Paquete> lista) {
+        if (lista == null || lista.isEmpty()) {
+            return null; // no se cae si está vacía
+        }
+        return masPesadoDyV(lista, 0, lista.size() - 1);
     }
 
+    // TU MÉTODO PERO CON VALIDACIÓN EXTRA
     public static Paquete masPesadoDyV(List<Paquete> lista, int izq, int der) {
-
+        if (lista == null || lista.isEmpty() || izq > der) {
+            return null;
+        }
         // Caso Base
         if (izq == der) {
             return lista.get(izq);
@@ -103,9 +107,13 @@ public class AnaliticasRecursivas {
 
         int mitad = (izq + der) / 2;
 
-        Paquete izqMax = masPesadoDyV(lista, izq, mitad);          // Subproblema Izq
-        Paquete derMax = masPesadoDyV(lista, mitad + 1, der); // Subproblema Der
+        Paquete izqMax = masPesadoDyV(lista, izq, mitad);
+        Paquete derMax = masPesadoDyV(lista, mitad + 1, der);
 
-        return (izqMax.getPeso() >= derMax.getPeso()) ? izqMax : derMax; // combinación
+        // por si alguna mitad viene nula
+        if (izqMax == null) return derMax;
+        if (derMax == null) return izqMax;
+
+        return (izqMax.getPeso() >= derMax.getPeso()) ? izqMax : derMax;
     }
 }

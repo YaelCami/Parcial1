@@ -29,6 +29,12 @@ public class Empresa {
     // Repartidores
     private HashMap<String, Repartidor> repartidoresPorId;
 
+    // Relación entre los paquetes asignados y sus repartidores
+    private Map<String, Repartidor> asignaciones;
+
+    // Códigos de paquetes que ya fueron entregados
+    private Set<String> codigosEntregados;
+
     public Empresa(){
         paquetesEnOrdenLlegada = new LinkedHashMap<>();
         paquetesPorCodigo = new HashMap<>();
@@ -39,6 +45,8 @@ public class Empresa {
         colaPrioridad = new PriorityQueue<>(new ComparadorPorPrioridad());
         historialEntregas = new HistorialEntregas<>();
         repartidoresPorId = new HashMap<>();
+        asignaciones = new HashMap<>();
+        codigosEntregados = new HashSet<>();
     }
 
     public boolean registrarPaquete(Paquete p) {
@@ -68,12 +76,16 @@ public class Empresa {
     // --- CONSULTAS ---
 
     public Paquete consultarPorCodigo(String codigo) {
-        return paquetesPorCodigo.get(codigo); // O(1) - esto es lo que evalúan
+        if (codigo == null) return null;
+        return paquetesPorCodigo.get(codigo.trim().toUpperCase());
     }
 
     public Repartidor consultarRepartidor(String id) {
-        return repartidoresPorId.get(id);
+        if (id == null) return null;
+        return repartidoresPorId.get(id.trim().toUpperCase());
     }
+
+
     // --- ORDEN DE LLEGADA Y PRIORIDAD ---
 
     public Paquete atenderPorOrdenLlegada() {
@@ -93,40 +105,107 @@ public class Empresa {
     // --- ASIGNACIÓN A REPARTIDOR CON REGLAS ---
 
     public boolean asignarPaqueteARepartidor(String codigoPaquete, String idRepartidor) {
+
+        if (codigoPaquete == null || idRepartidor == null) {
+            System.out.println("El código y la identificación son obligatorios.");
+            return false;
+        }
+
+        codigoPaquete = codigoPaquete.trim().toUpperCase();
+        idRepartidor = idRepartidor.trim();
+
         Paquete p = consultarPorCodigo(codigoPaquete);
         Repartidor r = consultarRepartidor(idRepartidor);
 
         if (p == null || r == null) {
-            System.out.println("Paquete o repartidor no existe");
-            return false;
-        }
-        // Regla: repartidor no disponible no puede recibir asignación
-        if (!r.isDisponible()) {
-            System.out.println("Repartidor no disponible");
-            return false;
-        }
-        // Regla: zona del repartidor debe corresponder al destino
-        if (r.getZona() != p.getDestino()) {
-            System.out.println("Zona no coincide: " + r.getZona() + " vs " + p.getDestino());
+            System.out.println("Paquete o repartidor no existe.");
             return false;
         }
 
+        if (codigosEntregados.contains(codigoPaquete)) {
+            System.out.println("Este paquete ya fue entregado.");
+            return false;
+        }
+
+        if (asignaciones.containsKey(codigoPaquete)) {
+            System.out.println("Este paquete ya tiene un repartidor asignado.");
+            return false;
+        }
+
+        if (!r.isDisponible()) {
+            System.out.println("El repartidor no está disponible.");
+            return false;
+        }
+
+        if (r.getZona() != p.getDestino()) {
+            System.out.println("La zona del repartidor no coincide con el destino.");
+            return false;
+        }
+
+        asignaciones.put(codigoPaquete, r);
         r.setDisponible(false);
-        System.out.println("Asignado " + p.getCodigo() + " a " + r.getNombre());
+
+        System.out.println(
+                "Paquete " + codigoPaquete +
+                        " asignado correctamente a " + r.getNombre()
+        );
+
         return true;
     }
 
     // --- HISTORIAL CON TU LISTA PROPIA ---
 
     public boolean registrarEntrega(String codigo, String idRepartidor) {
-        Paquete p = paquetesPorCodigo.get(codigo);
-        Repartidor r = repartidoresPorId.get(idRepartidor);
-        if (p == null || r == null) return false;
 
+        if (codigo == null || idRepartidor == null) {
+            System.out.println("El código y la identificación son obligatorios.");
+            return false;
+        }
+
+        codigo = codigo.trim().toUpperCase();
+        idRepartidor = idRepartidor.trim();
+
+        Paquete p = consultarPorCodigo(codigo);
+        Repartidor r = consultarRepartidor(idRepartidor);
+
+        if (p == null || r == null) {
+            System.out.println("Paquete o repartidor no existe.");
+            return false;
+        }
+
+        if (codigosEntregados.contains(codigo)) {
+            System.out.println("Este paquete ya fue entregado.");
+            return false;
+        }
+
+        Repartidor responsable = asignaciones.get(codigo);
+
+        if (responsable == null) {
+            System.out.println("El paquete no tiene un repartidor asignado.");
+            return false;
+        }
+
+        if (!responsable.getId().equals(r.getId())) {
+            System.out.println("Este repartidor no tiene asignado ese paquete.");
+            return false;
+        }
+
+        // Registrar la entrega en la lista propia
+        historialEntregas.agregar(p);
+
+        // Marcar el paquete como entregado
+        codigosEntregados.add(codigo);
+        asignaciones.remove(codigo);
+
+        // Retirar el paquete de las colas de pendientes
         colaLlegada.remove(p);
         colaPrioridad.remove(p);
-        historialEntregas.agregar(p);
+
+        // Liberar al repartidor
         r.setDisponible(true);
+
+        System.out.println("Entrega registrada correctamente.");
+
         return true;
     }
 

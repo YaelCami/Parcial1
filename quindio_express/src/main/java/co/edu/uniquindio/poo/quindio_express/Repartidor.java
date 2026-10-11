@@ -25,7 +25,10 @@ public class Repartidor {
     }
 
     public void setNombre(String nombre) {
-        this.nombre = nombre;
+        if (nombre == null || nombre.trim().isEmpty()) {
+            throw new IllegalArgumentException("El nombre no puede ser nulo o vacío");
+        }
+        this.nombre = nombre.trim();
     }
 
     public Municipio getZona() {
@@ -33,6 +36,9 @@ public class Repartidor {
     }
 
     public void setZona(Municipio zona) {
+        if (zona == null) {
+            throw new IllegalArgumentException("La zona no puede ser nula");
+        }
         this.zona = zona;
     }
 

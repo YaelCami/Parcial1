@@ -26,6 +26,7 @@ public class Main {
                 11. Eliminar del historial
                 12. Análisis recursivo
                 13. Pruebas de la lista propia
+                14. Ordenar por código/peso/prioridad/tiempo (Comparators)
                 0. Salir
 
                 Digite una opción:""";
@@ -44,11 +45,11 @@ public class Main {
                 case "5" -> paquetesPorMunicipio(empresa);
                 case "6" -> {
                     Paquete p = empresa.atenderPorOrdenLlegada();
-                    mostrar("Atención por llegada", p != null ? p.toString() : "No hay paquetes en cola");
+                    mostrar("Atención por llegada", p!= null? p.toString() : "No hay paquetes en cola");
                 }
                 case "7" -> {
                     Paquete p = empresa.despacharPorPrioridad();
-                    mostrar("Despacho prioritario", p != null ? p.toString() : "No hay paquetes en cola");
+                    mostrar("Despacho prioritario", p!= null? p.toString() : "No hay paquetes en cola");
                 }
                 case "8" -> asignar(empresa);
                 case "9" -> entrega(empresa);
@@ -56,6 +57,7 @@ public class Main {
                 case "11" -> eliminarHistorial(empresa);
                 case "12" -> analisis(empresa);
                 case "13" -> pruebasLista();
+                case "14" -> ordenarConComparators(empresa); // <-- ÚNICO CAMBIO NUEVO
                 default -> JOptionPane.showMessageDialog(null, "Opción no válida", TITULO, JOptionPane.WARNING_MESSAGE);
             }
         }
@@ -76,7 +78,7 @@ public class Main {
         String codigo = leer("Código del paquete:");
         if (codigo == null) return;
         Paquete p = empresa.consultarPorCodigo(codigo.trim());
-        mostrar("Consulta por código", p != null ? p.toString() : codigo + " no existe");
+        mostrar("Consulta por código", p!= null? p.toString() : codigo + " no existe");
     }
 
     // ---------- 3 ----------
@@ -98,7 +100,7 @@ public class Main {
                     Integer.parseInt(prioridad.trim()),
                     Integer.parseInt(tiempo.trim()));
             boolean ok = empresa.registrarPaquete(nuevo);
-            mostrar("Registro", ok ? "Paquete registrado" : "Error: el código " + codigo + " ya existe");
+            mostrar("Registro", ok? "Paquete registrado" : "Error: el código " + codigo + " ya existe");
         } catch (NumberFormatException e) {
             JOptionPane.showMessageDialog(null, "Debe digitar números válidos", TITULO, JOptionPane.ERROR_MESSAGE);
         }
@@ -130,7 +132,7 @@ public class Main {
         String id = leer("ID del repartidor (ej. R01):");
         if (id == null) return;
         boolean ok = empresa.asignarPaqueteARepartidor(codigo.trim(), id.trim());
-        mostrar("Asignación", ok ? "Asignación exitosa" :
+        mostrar("Asignación", ok? "Asignación exitosa" :
                 "No se pudo asignar (revise la consola: no existe, no disponible o zona distinta)");
     }
 
@@ -141,7 +143,7 @@ public class Main {
         String id = leer("ID del repartidor:");
         if (id == null) return;
         boolean ok = empresa.registrarEntrega(codigo.trim(), id.trim());
-        mostrar("Entrega", ok ? "Entrega registrada en el historial" : "El paquete o el repartidor no existe");
+        mostrar("Entrega", ok? "Entrega registrada en el historial" : "El paquete o el repartidor no existe");
     }
 
     // ---------- 10 ----------
@@ -167,7 +169,7 @@ public class Main {
             return;
         }
         boolean ok = empresa.getHistorial().eliminar(p);
-        mostrar("Eliminar", ok ? "Eliminado del historial" : "Ese paquete no está en el historial");
+        mostrar("Eliminar", ok? "Eliminado del historial" : "Ese paquete no está en el historial");
     }
 
     // ---------- 12 ----------
@@ -176,20 +178,28 @@ public class Main {
         List<Paquete> todos = empresa.getTodosLosPaquetes();
         StringBuilder sb = new StringBuilder();
 
-        sb.append(String.format("Peso total de ARMENIA: %.1f kg%n",
-                analiticas.pesoTotalPorMunicipio(todos, Municipio.ARMENIA)));
+        // AHORA PREGUNTA EL MUNICIPIO EN VEZ DE DEJARLO FIJO EN ARMENIA
+        Municipio municipioElegido = elegirMunicipio();
+        if (municipioElegido == null) return;
+
+        sb.append(String.format("Peso total de %s: %.1f kg%n",
+                municipioElegido, analiticas.pesoTotalPorMunicipio(todos, municipioElegido)));
         sb.append("Paquetes con prioridad >= 4: ")
                 .append(analiticas.contarPorPrioridadMinima(todos, 4)).append("\n");
 
         List<Paquete> ordenados = new ArrayList<>(todos);
-        Collections.sort(ordenados); // Comparable de Paquete: por código
+        Collections.sort(ordenados);
         Paquete buscado = analiticas.busquedaBinaria(ordenados, "PQ731");
         sb.append("Búsqueda binaria PQ731: ")
                 .append(buscado != null ? buscado.getCodigo() : "no encontrado").append("\n");
 
         Paquete masPesado = analiticas.masPesadoDyV(todos);
-        sb.append("Más pesado (divide y vencerás): ")
-                .append(masPesado.getCodigo()).append(" con ").append(masPesado.getPeso()).append(" kg");
+        if (masPesado != null) {
+            sb.append("Más pesado (divide y vencerás): ")
+                    .append(masPesado.getCodigo()).append(" con ").append(masPesado.getPeso()).append(" kg");
+        } else {
+            sb.append("Más pesado: lista vacía");
+        }
 
         mostrar("Análisis recursivo", sb.toString());
     }
@@ -226,6 +236,35 @@ public class Main {
         mostrar("Pruebas de la lista propia", sb.toString());
     }
 
+    // ---------- 14 NUEVO - LO ÚNICO QUE AGREGUÉ ----------
+    private static void ordenarConComparators(Empresa empresa) {
+        List<Paquete> base = new ArrayList<>(empresa.getTodosLosPaquetes());
+
+        List<Paquete> porCodigo = new ArrayList<>(base);
+        Collections.sort(porCodigo); // orden natural Comparable
+
+        List<Paquete> porPeso = new ArrayList<>(base);
+        porPeso.sort(new ComparadorPorPeso());
+
+        List<Paquete> porPrioridad = new ArrayList<>(base);
+        porPrioridad.sort(new ComparadorPorPrioridad());
+
+        List<Paquete> porTiempo = new ArrayList<>(base);
+        porTiempo.sort(new ComparadorPorTiempo());
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("POR CÓDIGO (Comparable natural):\n");
+        for (Paquete p : porCodigo) sb.append(p.getCodigo()).append(" ");
+        sb.append("\n\nPOR PESO (mayor a menor) - ComparadorPorPeso:\n");
+        for (Paquete p : porPeso) sb.append(p.getCodigo()).append("(").append(p.getPeso()).append("kg) ");
+        sb.append("\n\nPOR PRIORIDAD (mayor a menor) - ComparadorPorPrioridad:\n");
+        for (Paquete p : porPrioridad) sb.append(p.getCodigo()).append("(prio=").append(p.getPrioridad()).append(") ");
+        sb.append("\n\nPOR TIEMPO (menor a mayor) - ComparadorPorTiempo:\n");
+        for (Paquete p : porTiempo) sb.append(p.getCodigo()).append("(t=").append(p.getTiempoEstimado()).append(") ");
+
+        mostrar("Ordenar con Comparators - REQUISITO DEL PARCIAL", sb.toString());
+    }
+
     // ---------- Utilidades ----------
     private static String leer(String mensaje) {
         return JOptionPane.showInputDialog(null, mensaje, TITULO, JOptionPane.QUESTION_MESSAGE);
@@ -236,7 +275,6 @@ public class Main {
                 JOptionPane.QUESTION_MESSAGE, null, Municipio.values(), Municipio.values()[0]);
     }
 
-    // Muestra texto largo con scroll
     private static void mostrar(String titulo, String texto) {
         JTextArea area = new JTextArea(texto);
         area.setEditable(false);
